@@ -3,7 +3,7 @@ import { gettext as _, siteRoot, lang, getUrl } from '../globals';
 import Moment from 'react-moment';
 import filesize from 'filesize';
 import PropTypes from 'prop-types';
-import { compose } from 'recompose';
+import { compose, withState, withHandlers } from 'recompose';
 
 const PER_PAGE = 25;
 const REPO_ID = window.app.pageOptions.repoID;
@@ -96,7 +96,7 @@ class FileHistory extends React.Component {
           isError={this.state.isError}
           hasMore={this.state.hasMore}
           page={this.state.page}
-          />
+        />
 
       </div>
     );
@@ -118,8 +118,8 @@ const Tip = () => (
   <p className="tip">Tip: a new version will be generated after each modification, and you can restore the file to a previous version.</p>
 );
 
-const TableRow = ({ item, idx, onMouseLeave=f=>f, onMouseEnter=f=>f, isHovered=false }) => (
-  <tr onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}
+const TableRow = ({ item, idx, handleMouseEnter=f=>f, handleMouseLeave=f=>f, isHovered=false }) => (
+  <tr onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}
     className={isHovered ? 'hl' : ''}>
     <td className="time"><span title={item.ctime}><Moment locale={lang} fromNow>{item.ctime}</Moment></span> {idx === 0 && '(current version)'}</td>
     <td><img src={item.creator_avatar_url} width="16" height="16" alt="" className="avatar" /> <a href={getUrl({name: 'user_profile', username: item.creator_email})} className="vam">{item.creator_name}</a></td>
@@ -211,31 +211,18 @@ const InfiniteScrollErrorIndicator = ({ onClick=f=>f }) =>
   </div>;
 
 // HoC
-const withHover = (Component) => (
-  class WithHover extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        isHovered: false
-      };
-    }
+const withHoverState = withState('isHovered', 'toggleHovered', false);
 
-    onMouseEnter = () => {
-      this.setState({ isHovered: true });
-    }
-
-    onMouseLeave = () => {
-      this.setState({ isHovered: false });
-    }    
-
-    render() {
-      return <Component {...this.state} {...this.props}
-        onMouseEnter={this.onMouseEnter}
-        onMouseLeave={this.onMouseLeave}
-      />;
-    }
-  }
-);
+const withHoverHandler = withHandlers({
+  handleMouseEnter: (props) => e => {
+    let { toggleHovered } = props;
+    toggleHovered && toggleHovered(true);
+  },
+  handleMouseLeave: (props) => e => {
+    let { toggleHovered } = props;
+    toggleHovered && toggleHovered(false);
+  },
+});
 
 const withInfiniteScroll = (Component) =>
   class WithInfiniteScroll extends React.Component {
@@ -366,7 +353,10 @@ const TableWithInfinite = compose(
   withInfiniteScroll,
 )(Table);
 
-const TableRowWithHover = withHover(TableRow);
+const TableRowWithHover = compose(
+  withHoverState,
+  withHoverHandler,
+)(TableRow);
 
 export default FileHistory;
 

@@ -81,6 +81,10 @@ def edit_profile(request):
     else:
         webdav_passwd = ''
 
+    from social_django.models import UserSocialAuth
+    social_connected = UserSocialAuth.objects.filter(
+        username=request.user.username, provider='weixin-work').count() > 0
+
     resp_dict = {
             'form': form,
             'server_crypto': server_crypto,
@@ -94,6 +98,8 @@ def edit_profile(request):
             'ENABLE_CHANGE_PASSWORD': settings.ENABLE_CHANGE_PASSWORD,
             'ENABLE_WEBDAV_SECRET': settings.ENABLE_WEBDAV_SECRET,
             'webdav_passwd': webdav_passwd,
+            'social_connected': social_connected,
+            'social_next_page': reverse('edit_profile'),
     }
 
     if has_two_factor_auth():

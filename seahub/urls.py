@@ -682,3 +682,10 @@ if getattr(settings, 'ENABLE_CAS', False):
         url(r'^accounts/cas-logout/$', cas_logout, name='cas_ng_logout'),
         url(r'^accounts/cas-callback/$', cas_callback, name='cas_ng_proxy_callback'),
     ]
+
+
+from seahub.social_core.views import weixin_work_cb
+
+urlpatterns += [
+    url(r'^weixin-work/callback/$', weixin_work_cb),
+]

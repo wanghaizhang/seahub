@@ -1,12 +1,11 @@
+# encoding: utf-8
 import logging
 
 import requests
 from django.conf import settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.http import urlquote
 
 from seahub.social_core.utils.WXBizMsgCrypt import WXBizMsgCrypt
 from seahub.utils.urls import abs_reverse
@@ -135,11 +134,40 @@ def weixin_work_3rd_app_install(request):
     )
     return HttpResponseRedirect(url)
 
-@csrf_exempt
 def weixin_work_3rd_app_install_cb(request):
     """Callback for weixin work 3rd app install API.
 
     https://work.weixin.qq.com/api/doc#90001/90143/90597
+
+    e.g. https://dev.seafile.com/seahub/weixin-work/3rd-app-install/callback/?auth_code=7-NV971gJwA95gzezuBl6-QhqRPfpvryTz_XWd5s-8RosAj1wMzkqlC45H1xYhB9ebf42bdKua8Ocj7ckQkMz4fsoucDuwmXtjr-goztCSE&state=STATE123&expires_in=1200
     """
-    # TODO: check state
-    pass
+    auth_code = request.GET.get('auth_code', None)
+    state = request.GET.get('state', None)  # TODO: check state
+
+    if not (auth_code and state):
+        raise Http404
+
+    # 1. get perm code
+    suite_access_token = _get_suite_access_token()
+    url = 'https://qyapi.weixin.qq.com/cgi-bin/service/get_permanent_code?suite_access_token=' + suite_access_token
+
+    resp = requests.request(
+        'POST', url,
+        json={
+            "auth_code": auth_code
+        }
+    )
+
+    assert False
+
+a = '''{
+"access_token":"UAFEgMW5IazAeldj_AXOWQ-n2hLcCMD9zMjgg5tgIkwQPLw85efBzgZ9fiL1ReK1mdnlIZqcFHKWUbZYtYcEkY-DxrG8lay2bUOH3Fd3La2qYxXZ2V-t3xhQEcUi8d3Bqf67BZCwLK5Rsc-Vk3CX8ouba1A7FDAOV56pvuNTK2MTmvmoSoPcXdRL-orqGl2HiaCMc6KZOScyEbIaOEhMSg","expires_in":7200,
+
+"permanent_code":"5yWUpUc7DV8kcbtn_MCLHMQFjflA5DEFIADR-wbGUMI",
+
+"auth_corp_info":{"corpid":"wwcbae32011b764296","corp_name":"Seafile","corp_type":"verified","corp_round_logo_url":"http://p.qpic.cn/pic_wework/777222225/d4d278dcef2074c0a091de98ad16a352bc736d89785c029d/0","corp_square_logo_url":"https://p.qpic.cn/qqmail_pic/2560554501/3d3b9135a8758668aa65cfd2e821bb2a2eed2a5f98f1681a/0","corp_user_max":200,"corp_agent_max":0,"corp_wxqrcode":"http://p.qpic.cn/pic_wework/777222225/1f19b317c3610bb03d491c2125d718c5526385bdfb4d5dc9/0","corp_full_name":u"北京海文互知网络技术有限公司","subject_type":1,"verified_end_time":1572011699,"corp_scale":"1-50人","corp_industry":u"IT服务","corp_sub_industry":u"计算机软件/硬件/信息服务","location":u"北京市"},
+
+"auth_info":{"agent":[{"agentid":1000014,"name":"Seafile Dev SaaS","square_logo_url":"https://p.qlogo.cn/bizmail/ico25prcEu1EpwN0XF0fOfmx9yFP1caB6FKVMzGWQsOhVcQAaeZSPGA/0","privilege":{"level":1,"allow_party":[13],"allow_user":[],"allow_tag":[],"extra_party":[],"extra_user":[],"extra_tag":[]}}]},
+
+"auth_user_info":{"userid":"ZhengXie","name":u"郑勰","avatar":"https://p.qlogo.cn/bizmail/FYPnuBYjQhcVUlSbo2NI63AasITz26QarTgYLeR5FviagbzcGTWtlOQ/0"}}
+'''

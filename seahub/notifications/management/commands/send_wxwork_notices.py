@@ -63,23 +63,40 @@ class Command(BaseCommand, CommandLogMixin):
         self.do_action()
         self.log_debug('Finish sending WeChat Work msg.\n')
 
+    def get_agent_id_from_corp_id(self, corp_id):
+        pass
+
     def send_wx_msg(self, uid, title, content, detail_url):
+        if '|' not in uid:
+            corp_id = None
+            to_user = uid
+            agent_id = settings.SOCIAL_AUTH_WEIXIN_WORK_AGENTID
+        else:
+            corp_id, to_user = uid.split('|')
+            agent_id = self.get_agent_id_from_corp_id(corp_id)
+
         try:
             self.log_info('Send wechat msg to user: %s, msg: %s' % (uid, content))
-            response = self.api.httpCall(
-                CorpApi.CORP_API_TYPE['MESSAGE_SEND'],
-                {
-                    "touser": uid,
-                    "agentid": settings.SOCIAL_AUTH_WEIXIN_WORK_AGENTID,
-                    'msgtype': 'textcard',
-                    # 'climsgid': 'climsgidclimsgid_d',
-                    'textcard': {
-                        'title': title,
-                        'description': content,
-                        'url': detail_url,
-                    },
-                    'safe': 0,
-                })
+
+            if corp_id:
+                # send as corp app
+                pass
+            else:
+                # send as self-dev app
+                response = self.api.httpCall(
+                    CorpApi.CORP_API_TYPE['MESSAGE_SEND'],
+                    {
+                        "touser": to_user,
+                        "agentid": agent_id,
+                        'msgtype': 'textcard',
+                        'textcard': {
+                            'title': title,
+                            'description': content,
+                            'url': detail_url,
+                        },
+                        'safe': 0,
+                    })
+
             self.log_info(response)
         except Exception as ex:
             logger.error(ex, exc_info=True)

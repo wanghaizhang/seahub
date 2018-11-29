@@ -53,7 +53,13 @@ class WeixinWorkOAuth2(BaseOAuth2):
         """Return a unique ID for the current user, by default from server
         response."""
         if WEIXIN_WORK_SP:
-            return response.get('user_info').get('userid')
+            corp_id = response.get('corp_info').get('corpid')
+            assert corp_id and len(corp_id) > 0
+            user_id = response.get('user_info').get('userid')
+            assert user_id and len(user_id) > 0
+            assert '|' not in user_id
+
+            return '%s|%s' % (corp_id, user_id)
         else:
             return response.get(self.ID_KEY)
 

@@ -7,6 +7,7 @@ import re
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from django.utils import translation
 from django.utils.translation import ungettext
 from social_django.models import UserSocialAuth
@@ -15,7 +16,7 @@ from seahub.base.models import CommandsLastCheck
 from seahub.notifications.models import UserNotification
 from seahub.profile.models import Profile
 from seahub.utils import get_site_scheme_and_netloc, get_site_name
-from seahub.utils.weworkapi import CorpApi
+from seahub.utils.weworkapi import CorpApi, ServiceCorpApi
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -57,45 +58,70 @@ class Command(BaseCommand, CommandLogMixin):
 
     def handle(self, *args, **options):
         self.log_debug('Start sending WeChat Work msg...')
-        self.api = CorpApi.CorpApi(settings.SOCIAL_AUTH_WEIXIN_WORK_KEY,
-                                   settings.SOCIAL_AUTH_WEIXIN_WORK_SECRET)
+        self.api = None
+        self.service_apis = {}
 
-        self.do_action()
+        # self.do_action()
+        self.send_wx_msg('wwcbae32011b764296|ZhengXie', 'fxx', 'xyy', 'http://baidu.com')
+
         self.log_debug('Finish sending WeChat Work msg.\n')
 
-    def get_agent_id_from_corp_id(self, corp_id):
-        pass
+    def get_corp_permanent_code(self, corp_id):
+        return '5yWUpUc7DV8kcbtn_MCLHMQFjflA5DEFIADR-wbGUMI'
+
+    def get_suite_ticket(self, ):
+        ticket = cache.get('wx_work_suite_ticket', '')
+        if not ticket:
+            assert False, 'suite ticket not found!'
+        return ticket
 
     def send_wx_msg(self, uid, title, content, detail_url):
         if '|' not in uid:
             corp_id = None
             to_user = uid
             agent_id = settings.SOCIAL_AUTH_WEIXIN_WORK_AGENTID
+            if self.api is None:
+                self.api = CorpApi.CorpApi(settings.SOCIAL_AUTH_WEIXIN_WORK_KEY,
+                                           settings.SOCIAL_AUTH_WEIXIN_WORK_SECRET)
+
         else:
             corp_id, to_user = uid.split('|')
-            agent_id = self.get_agent_id_from_corp_id(corp_id)
+            # agent_id = self.get_agent_id_from_corp_id(corp_id)
+            agent_id = '1000014'
+            service_api = self.service_apis.get(corp_id)
+            if not service_api:
+                service_api = ServiceCorpApi.ServiceCorpApi(
+                    settings.SOCIAL_AUTH_WEIXIN_WORK_SUITID,
+                    settings.SOCIAL_AUTH_WEIXIN_WORK_SUIT_SECRET,
+                    suite_ticket=self.get_suite_ticket(),
+                    auth_corpid=corp_id,
+                    permanent_code=self.get_corp_permanent_code(corp_id),
+                )
+                self.service_apis[corp_id] = service_api
 
         try:
             self.log_info('Send wechat msg to user: %s, msg: %s' % (uid, content))
 
             if corp_id:
-                # send as corp app
-                pass
+                # send as service app
+                api = self.service_apis[corp_id]
             else:
-                # send as self-dev app
-                response = self.api.httpCall(
-                    CorpApi.CORP_API_TYPE['MESSAGE_SEND'],
-                    {
-                        "touser": to_user,
-                        "agentid": agent_id,
-                        'msgtype': 'textcard',
-                        'textcard': {
-                            'title': title,
-                            'description': content,
-                            'url': detail_url,
-                        },
-                        'safe': 0,
-                    })
+                # send as corp app
+                api = self.api
+
+            response = api.httpCall(
+                CorpApi.CORP_API_TYPE['MESSAGE_SEND'],
+                {
+                    "touser": to_user,
+                    "agentid": agent_id,
+                    'msgtype': 'textcard',
+                    'textcard': {
+                        'title': title,
+                        'description': content,
+                        'url': detail_url,
+                    },
+                    'safe': 0,
+                })
 
             self.log_info(response)
         except Exception as ex:

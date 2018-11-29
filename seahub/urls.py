@@ -673,8 +673,13 @@ if getattr(settings, 'ENABLE_CAS', False):
     ]
 
 
-from seahub.social_core.views import weixin_work_cb
+from seahub.social_core.views import (
+    weixin_work_cb, weixin_work_3rd_app_install, weixin_work_3rd_app_install_cb
+)
 
 urlpatterns += [
     url(r'^weixin-work/callback/$', weixin_work_cb),
+    url(r'^weixin-work/3rd-app-install/$', weixin_work_3rd_app_install),
+    url(r'^weixin-work/3rd-app-install/callback/$',
+        weixin_work_3rd_app_install_cb, name='weixin_work_3rd_app_install_cb'),
 ]

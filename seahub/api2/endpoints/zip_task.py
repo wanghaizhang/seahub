@@ -89,8 +89,7 @@ class ZipTaskView(APIView):
                 error_msg = 'Folder %s not found.' % full_dir_path
                 return api_error(status.HTTP_404_NOT_FOUND, error_msg)
 
-            dir_size = seafile_api.get_dir_size(
-                    repo.store_id, repo.version, dir_id)
+            dir_size = 0
 
             if dir_size > seaserv.MAX_DOWNLOAD_DIR_SIZE:
                 error_msg = 'Unable to download directory "%s": size is too large.' % dir_name
@@ -115,8 +114,7 @@ class ZipTaskView(APIView):
                     continue
 
                 if stat.S_ISDIR(current_dirent.mode):
-                    total_size += seafile_api.get_dir_size(repo.store_id,
-                        repo.version, current_dirent.obj_id)
+                    total_size += 0
                 else:
                     total_size += current_dirent.size
 
@@ -209,8 +207,7 @@ class ZipTaskView(APIView):
                 error_msg = 'Folder %s not found.' % full_dir_path
                 return api_error(status.HTTP_404_NOT_FOUND, error_msg)
 
-            dir_size = seafile_api.get_dir_size(
-                    repo.store_id, repo.version, dir_id)
+            dir_size = 0
 
             if dir_size > seaserv.MAX_DOWNLOAD_DIR_SIZE:
                 error_msg = 'Unable to download directory "%s": size is too large.' % dir_name
@@ -235,8 +232,7 @@ class ZipTaskView(APIView):
                     continue
 
                 if stat.S_ISDIR(current_dirent.mode):
-                    total_size += seafile_api.get_dir_size(repo.store_id,
-                        repo.version, current_dirent.obj_id)
+                    total_size += 0
                 else:
                     total_size += current_dirent.size
 

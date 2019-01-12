@@ -9,7 +9,7 @@ import Loading from './components/loading';
 import SaveSharedFileDialog from './components/dialog/save-shared-file-dialog';
 import toaster from './components/toast';
 import watermark from 'watermark-dom';
-import MarkdownViewer from '@seafile/seafile-editor/dist/viewer/markdown-viewer';
+import MarkdownViewer from './seafile-editor/src/viewer/markdown-viewer';
 
 import './css/shared-file-view.css';
 import './assets/css/fa-solid.css';

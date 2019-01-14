@@ -1,5 +1,4 @@
 import { Utils } from "../utils/utils";
-import { strChineseFirstPY } from "../utils/pinyin-by-unicode";
 
 class TreeNode {
 
@@ -50,7 +49,7 @@ class TreeNode {
   }
 
   setPreLoad(isPreload) {
-    strChineseFirstPY.isPreload = isPreload;
+    this.isPreload = isPreload;
   }
 
   isExpanded() {

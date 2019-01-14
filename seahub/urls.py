@@ -136,6 +136,7 @@ urlpatterns = [
     url(r'^oauth/', include('seahub.oauth.urls')),
     url(r'^social/', include('social_django.urls', namespace='social')),
     url(r'^social/error/', social_error, name="social_error"),
+    url(r'^social/post-login/', social_post_login, name="social_post_login"),
 
     url(r'^$', libraries, name='libraries'),
     #url(r'^home/$', direct_to_template, { 'template': 'home.html' } ),

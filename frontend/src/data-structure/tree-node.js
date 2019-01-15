@@ -2,31 +2,32 @@ import { Utils } from "../utils/utils";
 
 class TreeNode {
 
-  constructor({parentPath, object, isLoaded = false, isPreload = false, isExpanded = false}) {
-    if (!parentPath) {
-      throw new Error("The parentPath parameter is required.");
+  constructor({id, object, isLoaded = false, isPreload = false, isExpanded = false}) {
+    if (!id) {
+      throw new Error("The id parameter is required.");
     }
     if (!object) {
       throw new Error("The object parameter is required.");
     }
-    this.id = Utils.joinPath(parentPath, object.name),
-    this.parentId = parentPath;
+    this.id = id,
     this.object = object;
     this.loadUrl = this.id;
     this.isLoaded = isLoaded;
     this.isPreload = isPreload;
     this.isExpanded = isExpanded;
     this.children = [];
+    this.parentNode = null;
   }
 
   clone() {
     let treeNode = new TreeNode({
       id: this.id,
-      parentPath: this.parentId,
       object: this.object,
+      loadUrl: this.loadUrl,
       isLoaded: this.isLoaded,
       isPreload: this.isPreload,
-      isExpanded: this.isExpanded
+      isExpanded: this.isExpanded,
+      parentNode: this.parentNode,
     });
     treeNode.children = this.children.map(child => {
       let newChild = child.clone();
@@ -60,6 +61,14 @@ class TreeNode {
     this.isExpanded = isExpanded;
   }
 
+  getParentNode() {
+    return this.parentNode;
+  }
+
+  setParentNode(parentNode) {
+    this.parentNode = parentNode;
+  }
+
   hasChildren() {
     return this.children.length;
   }
@@ -76,12 +85,12 @@ class TreeNode {
 
     const treeNode = {
       id: this.id,
-      parentId: this.parentId,
       object: this.object,
       loadUrl: this.loadUrl,
       isLoaded: this.isLoaded,
       isPreload: this.isPreload,
       isExpanded: this.isExpanded,
+      parentNode: this.parentNode,
       children: children,
     }
 
@@ -89,7 +98,7 @@ class TreeNode {
   }
 
   static deserializefromJson(object) {
-    let { id, parentId, object, loadUrl, isLoaded, isExpanded, children = [] } = object;
+    let { id, object, loadUrl, isLoaded, isExpanded, parentNode, children = [] } = object;
 
     const treeNode = new TreeNode({
       id,
@@ -99,6 +108,7 @@ class TreeNode {
       isLoaded,
       isPreload,
       isExpanded,
+      parentNode,
       children: children.map(item => TreeNode.deserializefromJson(item))
     });
     return treeNode;

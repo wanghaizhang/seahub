@@ -27,11 +27,17 @@ class Tree {
   }
 
   getNodeChildren(node) {
-
+    let node = this.getNode();
+    return node.children;
   }
 
   getNodeChildrenObject(node) {
-
+    let node = this.getNode();
+    let objects = node.children.map(item => {
+      let object = item.object;
+      return object;
+    });
+    return objects;
   }
 
   addNodeToParent(node, parentNode) {
@@ -54,15 +60,15 @@ class Tree {
 
   }
 
-  updateNodeObjectParam(Node, key, newValue) {
+  updateNode(Node, key, newValue) {
 
   }
 
-  moveNodeToAnotherNode(node, destNode) {
+  moveNode(node, destNode) {
 
   }
 
-  copyNodeToAnotherNode(node, destNode) {
+  copyNode(node, destNode) {
 
   }
 

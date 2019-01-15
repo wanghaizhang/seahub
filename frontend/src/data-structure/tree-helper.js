@@ -32,7 +32,7 @@ class TreeHelper {
 
   }
 
-  updateNodeObjectParam({tree, node, key, newValue}) {
+  updateNode({tree, node, key, newValue}) {
 
   }
 
@@ -44,11 +44,11 @@ class TreeHelper {
 
   }
 
-  moveNodeToAnotherNodeByPath({tree, path, destPath}) {
+  moveNodeByPath({tree, path, destPath}) {
 
   }
 
-  copyNodeToAntherNodeByPath({tree, path, destPath}) {
+  copyNodeByPath({tree, path, destPath}) {
 
   }
 

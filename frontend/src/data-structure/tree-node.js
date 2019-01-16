@@ -3,13 +3,10 @@ import { Utils } from "../utils/utils";
 class TreeNode {
 
   constructor({id, object, isLoaded = false, isPreload = false, isExpanded = false}) {
-    if (!id) {
-      throw new Error("The id parameter is required.");
-    }
     if (!object) {
       throw new Error("The object parameter is required.");
     }
-    this.id = id,
+    this.id = id || object.name,
     this.object = object;
     this.loadUrl = this.id;
     this.isLoaded = isLoaded;

@@ -1,9 +1,13 @@
 class TreeHelper {
 
   loadedNode({tree, node}) {
+    
+  }
+  
+  loadedNodeByPath({tree, path}) {  // for search item
 
   }
-
+  
   expandNode({tree, node}) {
 
   }
@@ -16,23 +20,27 @@ class TreeHelper {
 
   }
 
+  findNodeByPath({tree, nodePath}) {
+
+  }
+
   sortNodeChildren({tree, node, soryType}) {
 
   }
 
-  addNodeToParent({tree, node}) {
+  addNodeToParentByPath({tree, nodePath}) {
 
   }
 
-  addNodeListToParent({tree, nodeList}) {
+  addNodeListToParentByPath({tree, nodePaths}) {
 
   }
 
-  renameNode({tree, node, newName}) {
+  renameNodeByPath({tree, nodePath, newName}) {
 
   }
 
-  updateNode({tree, node, key, newValue}) {
+  updateNodeByPath({tree, nodePath, key, newValue}) {
 
   }
 
@@ -44,11 +52,19 @@ class TreeHelper {
 
   }
 
-  moveNodeByPath({tree, path, destPath}) {
+  moveNodeByPath({tree, nodePath, destPath}) {
 
   }
 
-  copyNodeByPath({tree, path, destPath}) {
+  moveNodeListByPath({tree, nodePaths, destPath}) {
+
+  }
+
+  copyNodeByPath({tree, nodePath, destPath}) {
+
+  }
+
+  copyNodeListByPath({tree, nodePaths, destPath}) {
 
   }
 

@@ -1,3 +1,6 @@
+import TreeNode from './tree-node';
+import { Utils } from '../utils/utils';
+
 class Tree {
 
   constructor() {
@@ -5,7 +8,11 @@ class Tree {
   }
 
   clone() {
-
+    let tree = new Tree();
+    if (this.root) {
+      tree.root = this.root.clone();
+    }
+    return tree;
   }
 
   setRoot(node) {
@@ -16,6 +23,21 @@ class Tree {
     let findNode = null;
     function callback(currentNode) {
       if (currentNode.id === node.id) {
+        findNode = currentNode;
+        return true;
+      }
+      return false;
+    }
+    this.traverseDF(callback);
+    return findNode;
+  }
+
+  getNodeByPath(path) { 
+    // id ==== path
+    let id = path;
+    let findNode = null;
+    function callback(currentNode) {
+      if (currentNode.id === id) {
         findNode = currentNode;
         return true;
       }
@@ -41,6 +63,7 @@ class Tree {
       let object = item.object;
       return object;
     });
+    objects = Utils.sortDirents(objects, 'name', 'asc');  // todo optimized --> const define
     return objects;
   }
 
@@ -121,9 +144,16 @@ class Tree {
     }
   }
 
-  expandNode(node) {
+  expandNode(node, isExpandedAncestor) {
     node = this.getNode(node);
     node.setExpanded(true);
+
+    if (isExpandedAncestor) { // exparent current node all ancestor
+      while (node.parentNode) {
+        node.parentNode.setExpanded(true);
+        node = node.parentNode;
+      }
+    }
   }
   
   collapseNode(node) {
@@ -132,16 +162,22 @@ class Tree {
   }
 
   isNodeChild(node, parentNode) {
-    parentNode = this.getNode(parentNode);
     node = this.getNode(node);
+    parentNode = this.getNode(parentNode);
+    return parentNode.children.some(item => {
+      return item.id === node.id;
+    });
   }
 
   serializeToJson() {
-
+    return this.root.serializeToJson();
   }
 
   deserializefromJson(json) {
-
+    let root = TreeNode.deserializefromJson(json);
+    let tree = new Tree();
+    tree.setRoot(root);
+    return tree;
   }
 
 }

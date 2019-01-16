@@ -4,6 +4,10 @@ class Tree {
     this.root = null;
   }
 
+  clone() {
+
+  }
+
   setRoot(node) {
     this.root = node;
   }
@@ -41,35 +45,52 @@ class Tree {
   }
 
   addNodeToParent(node, parentNode) {
-
+    parentNode = this.getNode(parentNode);
+    parentNode.addChild(node);
   }
 
-  addNodeListToParent(node, parentNode) {
-
+  addNodeListToParent(nodeList, parentNode) {
+    parentNode = this.getNode(parentNode);
+    nodeList.forEach(node => {
+      parentNode.addCihld(node);
+    });
   }
 
   deleteNode(node) {
-
+    let parentNode = this.getNode(node.parentNode);
+    parentNode.deleteChild(node);
   }
 
   deleteNodeList(nodeList) {
-
+    nodeList.forEach(node => {
+      this.deleteNode(node);
+    });
   }
 
-  renameNode(Node, newName) {
-
+  renameNode(node, newName) {
+    node = this.getNode(node);
+    node.rename(newName);
   }
 
-  updateNode(Node, key, newValue) {
-
+  updateNode(node, key, newValue) {
+    node = this.getNode(node);
+    node.updateObjectParam(key, newValue);
   }
 
   moveNode(node, destNode) {
+    // add
+    destNode = this.getNode(destNode);
+    destNode.addChild(node);
 
+    // delete
+    let parentNode = this.getNode(node.parentNode);
+    parentNode.deleteChild(node);
   }
 
   copyNode(node, destNode) {
-
+    // add
+    destNode = this.getNode(destNode);
+    destNode.addChild(node);
   }
 
   traverseDF() {
@@ -101,15 +122,18 @@ class Tree {
   }
 
   expandNode(node) {
-
+    node = this.getNode(node);
+    node.setExpanded(true);
   }
-
+  
   collapseNode(node) {
-
+    node = this.getNode(node);
+    node.setExpanded(false);
   }
 
-  isNodeChild() {
-
+  isNodeChild(node, parentNode) {
+    parentNode = this.getNode(parentNode);
+    node = this.getNode(node);
   }
 
   serializeToJson() {

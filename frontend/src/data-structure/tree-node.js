@@ -66,11 +66,43 @@ class TreeNode {
   }
 
   setParentNode(parentNode) {
+
+    this.id = this.generatorId(parentNode);
+    this.loadUrl = this.id;
     this.parentNode = parentNode;
+
+    this.isLoaded = false;  // update parentNode need loaded data again;
   }
 
   hasChildren() {
     return this.children.length;
+  }
+
+  addChild(node) {
+    node.setParentNode(this);
+    this.children.push(node);
+  }
+
+  deleteChild(node) {
+    this.children = this.children.filter(item => {
+      return item.id !== node.id;
+    });
+  }
+
+  rename(newName) {
+    this.object.name = newName;
+    this.id = this.generatorId(this.parentNode);
+    this.loadUrl = this.id;
+    
+    this.isLoaded = false;  // rename node need loaded children again
+  }
+
+  updateObjectParam(key, newValue) {
+    this.object[key] = newValue;
+  }
+
+  generatorId(parentNode) {
+    return parentNode.id === '/' ? parentNode.id + this.object.name : parentNode.id + '/' + this.object.name;
   }
 
   sortTreeChildren(sortType) {

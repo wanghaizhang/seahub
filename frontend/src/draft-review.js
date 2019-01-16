@@ -53,6 +53,9 @@ class DraftReview extends React.Component {
       totalReversionCount: 0,
       changedNodes: [],
       isShowCommentDialog: false,
+      preCommitID: null,
+      currentCommitID: null,
+      historyKey: null,
     };
     this.quote = '';
     this.newIndex = null;
@@ -96,6 +99,19 @@ class DraftReview extends React.Component {
                   }); 
                 })
             })
+          return;
+        }
+
+        const hash = window.location.hash;
+        if (hash.indexOf('#history-') === 0) {
+          this.setState({
+            activeTab: 'history',
+            currentCommitID: hash.slice(9, 49),
+            preCommitID: hash.slice(49, 89),
+            historyKey: hash.slice(89, hash.length),
+            isLoading: false,
+          });
+          this.tabItemClick('history');
           return;
         }
 
@@ -815,7 +831,11 @@ class DraftReview extends React.Component {
                   </TabPane>
                   { this.state.reviewStatus == 'finished'? '':
                     <TabPane tabId="history" className="history">
-                      <HistoryList setDiffViewerContent={this.setDiffViewerContent} 
+                      <HistoryList
+                        preCommitID={this.state.preCommitID}
+                        currentCommitID={this.state.currentCommitID}
+                        historyKey={this.state.historyKey}
+                        setDiffViewerContent={this.setDiffViewerContent} 
                         historyList={this.state.historyList}
                         totalReversionCount={this.state.totalReversionCount}/>
                     </TabPane>

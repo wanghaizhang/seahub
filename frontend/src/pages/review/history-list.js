@@ -8,6 +8,7 @@ import { draftOriginRepoID, draftFilePath, draftOriginFilePath } from '../../uti
 
 import '../../css/file-history.css';
 
+const URL = require('url-parse');
 moment.locale(window.app.config.lang);
 
 class HistoryList extends React.Component {
@@ -22,7 +23,14 @@ class HistoryList extends React.Component {
     };
   }
 
+  setURL = (preCommitID, currentCommitID, key) => {
+    let url = new URL(window.location.href);
+    url.set('hash', 'history-' + preCommitID + currentCommitID + key);
+    window.location.href = url.toString();
+  }
+
   onClick = (event, key, preCommitID, currentCommitID)=> {
+    this.setURL(preCommitID, currentCommitID, key);
     if (key === this.state.activeItem) return false;
     this.setState({
       activeItem: key,
@@ -57,6 +65,37 @@ class HistoryList extends React.Component {
           });
         });
       }
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const hash = window.location.hash;
+    if (hash.indexOf('#history-') < 0 && this.props.historyList.length > 0) {
+      const list = this.props.historyList;
+      if (list.length === 1) {
+        const ID = list[0].commit_id;
+        this.setURL(ID, ID, 0);
+      }
+      else {
+        this.setURL(list[1].commit_id, list[0].commit_id, 0);
+      }
+    }
+    if (nextProps.historyKey !== this.props.historyKey) {
+      let that = this;
+      setTimeout(function(){
+        const { preCommitID, currentCommitID, historyKey } = nextProps;
+        that.setState({
+          activeItem: parseInt(historyKey),
+        });
+        axios.all([
+          seafileAPI.getFileRevision(draftOriginRepoID, currentCommitID, draftFilePath),
+          seafileAPI.getFileRevision(draftOriginRepoID, preCommitID, draftFilePath)
+        ]).then(axios.spread((res1, res2) => {
+          axios.all([seafileAPI.getFileContent(res1.data), seafileAPI.getFileContent(res2.data)]).then(axios.spread((content1,content2) => {
+            that.props.setDiffViewerContent(content2.data, content1.data);
+          }));
+        }));
+      }, 1000);
     }
   }
 

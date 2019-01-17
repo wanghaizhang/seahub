@@ -95,19 +95,21 @@ class Tree {
     node.rename(newName);
   }
 
-  updateNode(node, key, newValue) {
+  updateNode(node, keys, newValues) {
     node = this.getNode(node);
-    node.updateObjectParam(key, newValue);
+    node.updateObjectParam(keys, newValues);
   }
 
   moveNode(node, destNode) {
+    let nodeCopy = node.clone();
+
     // add
     destNode = this.getNode(destNode);
     destNode.addChild(node);
 
     // delete
-    let parentNode = this.getNode(node.parentNode);
-    parentNode.deleteChild(node);
+    let parentNode = this.getNode(nodeCopy.parentNode);
+    parentNode.deleteChild(nodeCopy);
   }
 
   copyNode(node, destNode) {

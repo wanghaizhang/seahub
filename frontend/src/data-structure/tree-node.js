@@ -94,8 +94,14 @@ class TreeNode {
     this.isLoaded = false;  // rename node need loaded children again
   }
 
-  updateObjectParam(key, newValue) {
-    this.object[key] = newValue;
+  updateObjectParam(keys, newValues) {
+    if (Array.isArray(keys) && Array.isArray(newValues)) {
+      keys.forEach((key, index) => {
+        this.object[key] = newValues[index];
+      });
+    } else {
+      this.object[keys] = newValues;
+    }
   }
 
   generatorId(parentNode) {
